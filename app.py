@@ -1,4 +1,3 @@
-
 from flask import Flask, request, jsonify
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array, load_img
@@ -18,30 +17,26 @@ def preprocess_image(image_path):
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    if 'files' not in request.files:
+    if 'file' not in request.files:
         return jsonify({'error': 'No file part'})
 
-    files = request.files.getlist('files')
-    if len(files) == 0:
-        return jsonify({'error': 'No selected files'})
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'})
 
-    predictions = {}
-    for file in files:
-        if file:
-            file_path = f"./{file.filename}"
-            file.save(file_path)
+    if file:
+        file_path = f"./{file.filename}"
+        file.save(file_path)
 
-            image = preprocess_image(file_path)
-            result = model.predict(image)
+        image = preprocess_image(file_path)
+        result = model.predict(image)
 
-            if result[0][0] > 0.5:
-                prediction = "normal"
-            else:
-                prediction = "cancer"
+        if result[0][0] > 0.5:
+            prediction = "normal"
+        else:
+            prediction = "cancer"
 
-            predictions[file.filename] = prediction
-
-    return jsonify(predictions)
+        return jsonify({'prediction': prediction})
 
 if __name__ == '__main__':
     app.run(debug=True)
