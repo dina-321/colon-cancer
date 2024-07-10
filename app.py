@@ -6,7 +6,7 @@ import numpy as np
 app = Flask(__name__)
 
 # Load the trained model
-model = load_model('my_weights_new_adam.h5')
+model = load_model('my_weights_new_opt.h5')
 
 # Define a function to preprocess the image
 def preprocess_image(image_path):
